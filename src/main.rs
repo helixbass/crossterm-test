@@ -1,5 +1,4 @@
 use std::io::{stdout, Write};
-use std::time::Duration;
 
 use crossterm::{
     cursor,
@@ -20,6 +19,8 @@ fn main() {
     let (width, height) = size().unwrap();
 
     let mut cursor_position = Position { row: 4, column: 4 };
+
+    let mut num_changed = 0;
 
     let mut grid: Vec<String> = (0..height)
         .into_iter()
@@ -51,6 +52,23 @@ fn main() {
                 stdout
                     .queue(cursor::MoveTo(cursor_position.column, cursor_position.row))
                     .unwrap();
+                stdout.flush().unwrap();
+            }
+            Event::Key(key_event) if key_event.code == KeyCode::Char('f') => {
+                grid[num_changed].replace_range(num_changed..=num_changed, "1");
+                num_changed += 1;
+
+                stdout.queue(cursor::SavePosition).unwrap();
+                stdout.queue(cursor::Hide).unwrap();
+                stdout.queue(cursor::MoveTo(0, 0)).unwrap();
+
+                for row in &grid {
+                    stdout.queue(Print(&row)).unwrap();
+                }
+
+                stdout.queue(cursor::RestorePosition).unwrap();
+                stdout.queue(cursor::Show).unwrap();
+
                 stdout.flush().unwrap();
             }
             _ => {}
