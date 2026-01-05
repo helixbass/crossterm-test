@@ -71,7 +71,9 @@ fn main() {
 
                 stdout.flush().unwrap();
             }
-            _ => {}
+            event => {
+                eprintln!("event: {event:#?}");
+            }
         }
     }
 
